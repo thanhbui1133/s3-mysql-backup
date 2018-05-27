@@ -2,6 +2,8 @@
 
 # Based on https://gist.github.com/2206527
 
+# To decrypt the files use something like: gpg --batch --no-tty --yes --decrypt --passphrase $secret_key "$tmpfile"
+
 # Be pretty
 echo -e " "
 echo -e " .  ____  .    ______________________________"

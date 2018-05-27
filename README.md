@@ -11,11 +11,26 @@ To run the script the following environment variables are required:
  * DB_HOST
  * DB_PORT
  * S3_BUCKET (e.g. my-bucket)
+ * SECRET_KEY (i.e. strong random encryption key)
 
-The aws cli for S3 uploads also needs a `~/.aws/credentials` which can be created using `aws configure`. You then simply run
+The aws cli for S3 uploads also needs a `~/.aws/credentials` which can be created using `aws configure`. You then simply run: 
 
 ```
 s3mysqlbackup.sh
+```
+
+## Restoring the database
+
+If you need to restore the files you first need to decrypt them with something like: 
+
+```
+gpg --batch --no-tty --yes --decrypt --passphrase $secret_key "$tmpfile"
+```
+
+Then load them with something like: 
+
+```
+find . -name '*.sql' | awk '{ print "source",$0 }' | mysql -u root -p$mysqlpass -h you.host.com -P 3306 --batch
 ```
 
 ## Building
