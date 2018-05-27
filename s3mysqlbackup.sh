@@ -41,7 +41,7 @@ for db in $databases; do
   # Feedback
   echo -e "\e[1;34m$db\e[00m"
 
-  # Dump and zip
+  # Dump and gpg encrypt
   echo -e "  creating \e[0;35m$tmpfile\e[00m"
   mysqldump -u $mysqluser -p$mysqlpass -h $mysqlhost -P $mysqlport --force --opt --databases "$db" | gpg --batch --no-tty --yes --output "$tmpfile" --symmetric --passphrase $secret_key 
 
