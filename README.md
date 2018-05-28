@@ -2,6 +2,8 @@
 
 Backup a mysql database server to S3. This script is inspired by [oodavid](https://gist.github.com/oodavid/2206527) but uses the AWS CLI tools and also GPG symmetric encrypts the file. See the [dariancabot](https://dariancabot.com/2017/05/07/aws-s3-uploading-and-downloading-from-linux-command-line/) blog fore more details. 
 
+This code is available as a RHEL7 container on hub.docker.com at https://hub.docker.com/r/simonmassey/s3-mysql-backup
+
 ## Usage
 
 To run the script the following environment variables are required: 
