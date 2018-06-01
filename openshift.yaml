@@ -1,17 +1,20 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: s3-mysql-backups
+  name: s3-mysql-backup
 spec:
-  schedule: "*/1 * * * *"  
+  schedule: "30 2 * * *"  
   jobTemplate:             
     spec:
       template:
         spec:
           containers:
-          - name: s3-mysql-backups
-            image: simonmassey/s3-mysql-backup
+          - name: s3-mysql-backup
+            image: simonmassey/s3-mysql-backup:20180501_2219
             command: ["/var/lib/mysql/bin/s3mysqlbackup.sh"]
+            envFrom:
+            - secretRef:
+                name: s3-mysql-backup
             volumeMounts:
               - name: secret-volume-credential
                 mountPath: /var/lib/mysql/.aws
