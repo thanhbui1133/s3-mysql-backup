@@ -1,6 +1,6 @@
 # s3-mysql-backsup
 
-Backup a mysql database server to S3. This script is inspired by [oodavid](https://gist.github.com/oodavid/2206527) but uses the AWS CLI tools and also GPG symmetric encrypts the file. See the [dariancabot](https://dariancabot.com/2017/05/07/aws-s3-uploading-and-downloading-from-linux-command-line/) blog fore more details. 
+Backup a mysql database server to S3. This script is inspired by [oodavid](https://gist.github.com/oodavid/2206527) but uses the AWS CLI tools and also GPG symmetric encrypts the file. See the [dariancabot](https://dariancabot.com/2017/05/07/aws-s3-uploading-and-downloading-from-linux-command-line/) blog for more details. 
 
 This code is available as a RHEL7 container on hub.docker.com at https://hub.docker.com/r/simonmassey/s3-mysql-backup
 
@@ -17,8 +17,14 @@ To run the script the following environment variables are required:
 
 The aws cli for S3 uploads also needs a `~/.aws/credentials` which can be created using `aws configure`. You then simply run: 
 
-```
+```sh
 s3mysqlbackup.sh
+```
+
+This tools is availabe on hub.docker.com at simonmassey/s3-mysql-backup
+
+```sh
+docker run -it  --env-file=.env s3-mysql-backups:latest /var/lib/mysql/bin/s3mysqlbackup.sh
 ```
 
 ## Restoring the database
@@ -35,10 +41,4 @@ Then load them with something like:
 find . -name '*.sql' | awk '{ print "source",$0 }' | mysql -u root -p$mysqlpass -h you.host.com -P 3306 --batch
 ```
 
-## Building
 
-Build the docker image with:
-
-```
-docker build  -t s3-mysql-backups .
-```
