@@ -10,6 +10,7 @@ RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.
     rm awscli-bundle.zip
 ENV PATH="~/bin:${PATH}"
 COPY s3mysqlbackup.sh /var/lib/mysql/bin/
-#RUN chmod +x /var/lib/mysql/bin/s3mysqlbackup.sh
+RUN mkdir -p /var/lib/mysql/.aws && chgrp root /var/lib/mysql/.aws && chmod g+rwx /var/lib/mysql/.aws
+COPY config /var/lib/mysql/bin/
 USER 1001
 CMD /bin/bash

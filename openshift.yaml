@@ -1,0 +1,23 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: s3-mysql-backups
+spec:
+  schedule: "30 2 * * *"  
+  jobTemplate:             
+    spec:
+      template:
+        spec:
+          containers:
+          - name: s3-mysql-backups
+            image: simonmassey/s3-mysql-backup
+            command: ["/var/lib/mysql/bin/s3mysqlbackup.sh"]
+            volumeMounts:
+              - name: secret-volume-credential
+                mountPath: /var/lib/mysql/.aws
+                readOnly: true
+          volumes:
+            - name: secret-volume-credential
+              secret:
+                secretName: credential
+          restartPolicy: OnFailure
