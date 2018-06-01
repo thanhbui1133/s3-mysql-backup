@@ -15,8 +15,14 @@ To run the script the following environment variables are required:
 
 The aws cli for S3 uploads also needs a `~/.aws/credentials` which can be created using `aws configure`. You then simply run: 
 
-```
+```sh
 s3mysqlbackup.sh
+```
+
+This tools is availabe on hub.docker.com at simonmassey/s3-mysql-backup
+
+```sh
+docker run -it  --env-file=.env s3-mysql-backups:latest /var/lib/mysql/bin/s3mysqlbackup.sh
 ```
 
 ## Restoring the database
@@ -33,10 +39,4 @@ Then load them with something like:
 find . -name '*.sql' | awk '{ print "source",$0 }' | mysql -u root -p$mysqlpass -h you.host.com -P 3306 --batch
 ```
 
-## Building
 
-Build the docker image with:
-
-```
-docker build  -t s3-mysql-backups .
-```
