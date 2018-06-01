@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: s3-mysql-backups
 spec:
-  schedule: "30 2 * * *"  
+  schedule: "*/1 * * * *"  
   jobTemplate:             
     spec:
       template:
@@ -19,5 +19,5 @@ spec:
           volumes:
             - name: secret-volume-credential
               secret:
-                secretName: credential
+                secretName: credentials
           restartPolicy: OnFailure
