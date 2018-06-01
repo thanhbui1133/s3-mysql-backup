@@ -23,7 +23,7 @@ s3mysqlbackup.sh
 
 This tools is availabe on hub.docker.com at simonmassey/s3-mysql-backup
 
-## Setting up on OpenShift
+## Setting up on OpenShift Kubernetes
 
 The `openshift.yaml` sets the job to run daily at 2:30am. You need to run `aws configure` and save the generated `$HOME/.aws/*` into the root of this repo. (Ours our hidden by `git secret` so if you know the secret just `git secret reveal`.) You also need a `.env` file with the environment variabiles listed above. Then simply: 
 
