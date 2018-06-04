@@ -1,3 +1,4 @@
 .env
 credentials
 .gitsecret/keys/random_seed
+hello.txt
