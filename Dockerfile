@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/rhscl/mysql-57-rhel7
+FROM centos/mysql-57-centos7:latest
 MAINTAINER Simon Massey <simbo1905@60hertz.com>
 LABEL io.k8s.description="MySQL s3 backups" \
       io.k8s.display-name="MySQL s3 backups" \
