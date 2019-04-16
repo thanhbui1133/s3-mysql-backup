@@ -16,9 +16,9 @@ object="$bucket/$stamp/backup.sql"
 /opt/rh/rh-mysql57/root/usr/bin/mysqldump -u $mysqluser -P $mysqlport -h $mysqlhost -u wordpress -p$mysqlpass $mysqlname > backup.sql;
 
 if [ $? -eq 0 ]; then
-  echo OK
+  echo Dump database $mysqlname ok
 else
-  echo FAILED Could not mysqldump "backup.sql"
+  echo FAILED Could not mysqldump database $mysqlname to "backup.sql"
   exit 1
 fi
 
@@ -27,8 +27,6 @@ methods="$METHODS"
 IFS=","
 
 read -ra methodsArr <<< "$methods"
-
-echo $methodsArr
 
 for i in "${methodsArr[@]}"; do
     case "$i" in
@@ -42,19 +40,28 @@ for i in "${methodsArr[@]}"; do
         aws s3 cp "backup.sql" "$object"
 
         if [ $? -eq 0 ]; then
-          echo OK
+          echo Upload successful
         else
           echo FAILED Could not aws s3 cp "backup.sql" "$object"
           exit 2
         fi
         ;;
         "pvc") echo "Starting pvc backup..."
+        if [ ! -d "/data/backup/$stamp" ]; then
+            mkdir "/data/backup/$stamp"
+        fi
         mv "backup.sql" "/data/backup/$stamp/backup.sql"
+        if [ $? -eq 0 ]; then
+          echo Backup successful
+        else
+          echo FAILED Could not move "backup.sql" to specific folder
+          exit 2
+        fi
         ;;
     esac
 done
 
-
+IFS=" "
 
 # Delete
 rm -f "backup.sql"
