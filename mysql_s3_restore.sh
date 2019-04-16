@@ -34,7 +34,7 @@ if [ $? -eq 0 ]; then
 		
 		sleep 2m
 		
-		if [ siteurl != "" ]; then
+		if [ "$siteurl" != "" ]; then
 			mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force -D $mysqlname -e "UPDATE wp_options SET option_value = '$siteurl' where option_name = 'siteurl' or option_name = 'home'"
 		fi
 		echo Done
