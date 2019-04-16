@@ -2,9 +2,6 @@
 
 # Basic variables
 
-aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KE"
-
 mysqlpass="$MYSQL_PASSWORD"
 mysqlname="$MYSQL_NAME"
 mysqluser="$MYSQL_USER"
@@ -36,6 +33,11 @@ echo $methodsArr
 for i in "${methodsArr[@]}"; do
     case "$i" in
         "s3") echo "Starting s3 backup..."
+
+        echo "Setup environment"
+        aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+        aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+
         echo -e "  uploading..."
         aws s3 cp "backup.sql" "$object"
 
