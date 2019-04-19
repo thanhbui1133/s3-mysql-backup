@@ -77,7 +77,7 @@ case "$method" in
 	    exit 2
 		;;
     esac
-    echo backuppath
+    echo $backuppath
 #if [ $? -eq 0 ]; then
 #    echo Download OK
 #	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force drop $mysqlname
