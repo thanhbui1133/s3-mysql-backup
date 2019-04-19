@@ -44,6 +44,8 @@ case "$method" in
                 if [ "$nearest" = "" ]; then
                     nearest=$timestamptemp
                 fi
+                echo $nearest
+                echo $timestamptemp
                 if [ "$nearest" -gt "$timestamptemp" ]; then
                     nearest=$timestamptemp
                     nearestfolder=$i
