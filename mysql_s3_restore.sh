@@ -36,17 +36,19 @@ case "$method" in
             cd /data/backup
             now=`date +"%s"`
             nearest=$now
-            nearestfolder=""
             dirbackup=(`ls /data/backup`)
+            nearestfolder="${dirbackup[0]}"
             for i in "${dirbackup[@]}"; do
                 echo $i
                 result=`echo "$i" | sed -r 's/[_]+/\//g'`
                 echo $result
-                echo $timestamptemp
                 timestamptemp=`date -d $result +"%s"`
+                echo $timestamptemp
+                echo $nearest
                 if [ "$timestamptemp" -gt "$nearest" ]; then
                     nearest=$timestamptemp
                     nearestfolder=$i
+                    echo $nearest
                 fi
             done
             echo $nearestfolder
