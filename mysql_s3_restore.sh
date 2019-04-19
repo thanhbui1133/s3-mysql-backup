@@ -44,14 +44,11 @@ case "$method" in
                 if [ "$nearest" = "" ]; then
                     nearest=$timestamptemp
                 fi
-                echo $nearest
-                echo $timestamptemp
                 if [ "$timestamptemp" -gt "$nearest" ]; then
                     nearest=$timestamptemp
                     nearestfolder=$i
                 fi
             done
-            echo $nearestfolder
             cd $nearestfolder
             filebackup=(`ls`)
             nearest=${filebackup[0]}
@@ -61,14 +58,12 @@ case "$method" in
                 result=`echo "$result" | sed -r 's/[.sql]+//g'`
                 result+=":00"
                 timestamptemp=`date -d $result +"%s"`
-                echo $timestamptemp
-                echo $result
-#                if [ "$timestamptemp" -gt "$nearest" ]; then
-#                    nearest=$timestamptemp
-#                    nearestfile=$i
-#                fi
+                if [ "$timestamptemp" -gt "$nearest" ]; then
+                    nearest=$timestamptemp
+                    nearestfile=$i
+                fi
             done
-#            backuppath="$nearestfolder/$nearestfile"
+            backuppath="$nearestfolder/$nearestfile"
         else
             echo "Backup file found"
             backuppath=$location
@@ -79,7 +74,7 @@ case "$method" in
 	    exit 2
 		;;
     esac
-
+    echo backuppath
 #if [ $? -eq 0 ]; then
 #    echo Download OK
 #	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force drop $mysqlname
