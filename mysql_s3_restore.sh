@@ -41,7 +41,7 @@ case "$method" in
             for i in "${dirbackup[@]}"; do
                 result=`echo "$i" | sed -r 's/[_]+/\//g'`
                 timestamptemp=`date -d $result +"%s"`
-                if [ $timestamptemp -gt $nearest ]; then
+                if [ "$timestamptemp" -gt "$nearest" ]; then
                     nearest=$timestamptemp
                     nearestfolder=$i
                 fi
@@ -54,7 +54,7 @@ case "$method" in
                 result=`echo "$result" | sed -r 's/[.sql]+//g'`
                 result+=":00"
                 timestamptemp=`date -d $result +"%s"`
-                if [ $timestamptemp -gt $nearest ]; then
+                if [ "$timestamptemp" -gt "$nearest" ]; then
                     nearest=$timestamptemp
                     nearestfile=$i
                 fi
