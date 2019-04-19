@@ -46,20 +46,21 @@ case "$method" in
                     nearestfolder=$i
                 fi
             done
-            cd $nearestfolder
-            filebackup=(`ls`)
-            nearest=${filebackup[0]}
-            for i in "${filebackup[@]}"; do
-                result=`echo "$i" | sed -r 's/[_]+/:/g'`
-                result=`echo "$result" | sed -r 's/[.sql]+//g'`
-                result+=":00"
-                timestamptemp=`date -d $result +"%s"`
-                if [ "$timestamptemp" -gt "$nearest" ]; then
-                    nearest=$timestamptemp
-                    nearestfile=$i
-                fi
-            done
-            backuppath="$nearestfolder/$nearestfile"
+            echo $nearestfolder
+#            cd $nearestfolder
+#            filebackup=(`ls`)
+#            nearest=${filebackup[0]}
+#            for i in "${filebackup[@]}"; do
+#                result=`echo "$i" | sed -r 's/[_]+/:/g'`
+#                result=`echo "$result" | sed -r 's/[.sql]+//g'`
+#                result+=":00"
+#                timestamptemp=`date -d $result +"%s"`
+#                if [ "$timestamptemp" -gt "$nearest" ]; then
+#                    nearest=$timestamptemp
+#                    nearestfile=$i
+#                fi
+#            done
+#            backuppath="$nearestfolder/$nearestfile"
         else
             echo "Backup file found"
             backuppath=$location
