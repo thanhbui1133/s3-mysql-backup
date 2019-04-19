@@ -51,13 +51,16 @@ case "$method" in
             done
             cd $nearestfolder
             filebackup=(`ls`)
-            nearest=${filebackup[0]}
-            echo nearest
+            nearest=""
+            echo $nearest
             for i in "${filebackup[@]}"; do
                 result=`echo "$i" | sed -r 's/[_]+/:/g'`
                 result=`echo "$result" | sed -r 's/[.sql]+//g'`
                 result+=":00"
                 timestamptemp=`date -d $result +"%s"`
+                if [ "$nearest" = "" ]; then
+                    nearest=$timestamptemp
+                fi
                 if [ "$timestamptemp" -gt "$nearest" ]; then
                     nearest=$timestamptemp
                     nearestfile=$i
