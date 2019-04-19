@@ -35,20 +35,18 @@ case "$method" in
             echo "Backup file not found! Finding lastest backup..."
             cd /data/backup
             now=`date +"%s"`
-            nearest=$now
             dirbackup=(`ls /data/backup`)
+            nearest=""
             nearestfolder="${dirbackup[0]}"
             for i in "${dirbackup[@]}"; do
-                echo $i
                 result=`echo "$i" | sed -r 's/[_]+/\//g'`
-                echo $result
                 timestamptemp=`date -d $result +"%s"`
-                echo $timestamptemp
-                echo $nearest
-                if [ "$timestamptemp" -gt "$nearest" ]; then
+                if [ "$nearest" -eq "" ]; then
+                    nearest=$timestamptemp
+                fi
+                if [ "$nearest" -gt "$timestamptemp" ]; then
                     nearest=$timestamptemp
                     nearestfolder=$i
-                    echo $nearest
                 fi
             done
             echo $nearestfolder
