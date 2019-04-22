@@ -14,7 +14,7 @@ methods="$METHODS"
 stampdate=`date +"%m_%d_%Y"`
 stamphour=`date +"%H_%M"`
 
-location="$stampdate/$stamphour.sql"
+location="$mysqlname/$stampdate/$stamphour.sql"
 
 /opt/rh/rh-mysql57/root/usr/bin/mysqldump -u $mysqluser -P $mysqlport -h $mysqlhost -u wordpress -p$mysqlpass $mysqlname > backup.sql;
 
@@ -55,10 +55,13 @@ for i in "${methodsArr[@]}"; do
         fi
         ;;
         "pvc") echo "Starting pvc backup..."
-        if [ ! -d "/data/backup/$stampdate" ]; then
-            mkdir "/data/backup/$stampdate"
+        if [ ! -d "/data/backup/$mysqlname" ]; then
+            mkdir "/data/backup/$mysqlname"
         fi
-        mv "backup.sql" "/data/backup/$stampdate/$stamphour.sql"
+        if [ ! -d "/data/backup/$mysqlname/$stampdate" ]; then
+            mkdir "/data/backup/$mysqlname/$stampdate"
+        fi
+        mv "backup.sql" "/data/backup/$mysqlname/$stampdate/$stamphour.sql"
         if [ $? -eq 0 ]; then
           echo " Backup successful"
         else
