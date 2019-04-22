@@ -11,10 +11,9 @@ bucket="$AWS_BUCKET"
 methods="$METHODS"
 
 #stamp=`date +"%s_%A_%d_%B_%Y_%H%M"`
-stampdate=`date +"%m_%d_%Y"`
-stamphour=`date +"%H_%M"`
+stamp=`date +"%m_%d_%Y_%H_%M_%S"`
 
-location="$mysqlname/$stampdate/$stamphour.sql"
+location="$mysqlname/$stamp.sql"
 
 /opt/rh/rh-mysql57/root/usr/bin/mysqldump -u $mysqluser -P $mysqlport -h $mysqlhost -u wordpress -p$mysqlpass $mysqlname > backup.sql;
 
@@ -58,10 +57,7 @@ for i in "${methodsArr[@]}"; do
         if [ ! -d "/data/backup/$mysqlname" ]; then
             mkdir "/data/backup/$mysqlname"
         fi
-        if [ ! -d "/data/backup/$mysqlname/$stampdate" ]; then
-            mkdir "/data/backup/$mysqlname/$stampdate"
-        fi
-        mv "backup.sql" "/data/backup/$mysqlname/$stampdate/$stamphour.sql"
+        mv "backup.sql" "/data/backup/$mysqlname/$location"
         if [ $? -eq 0 ]; then
           echo " Backup successful"
         else
