@@ -57,7 +57,7 @@ for i in "${methodsArr[@]}"; do
         if [ ! -d "/data/backup/$mysqlname" ]; then
             mkdir "/data/backup/$mysqlname"
         fi
-        mv "backup.sql" "/data/backup/$mysqlname/$location"
+        mv "backup.sql" "/data/backup/$location"
         if [ $? -eq 0 ]; then
           echo " Backup successful"
         else
