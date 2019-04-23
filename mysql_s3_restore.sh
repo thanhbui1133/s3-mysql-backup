@@ -12,7 +12,7 @@ location="$LOCATION"
 method="$METHODS"
 backuppath=""
 
-find_lastest_bk() {
+find_latest_bk() {
     if [ -z "$1" ]
     then
         echo No variable found
@@ -67,15 +67,15 @@ case "$method" in
             if aws s3 ls "$bucketstr" 2>&1 | grep -q 'NoSuchBucket\|AllAccessDisabled'; then
                 echo This bucket is not exist or access denied
             else
-                echo FAILED Could not get from s3 "backup.sql" from "$object". Finding lastest backup at "$bucketstr"...
+                echo FAILED Could not get from s3 "backup.sql" from "$object". Finding latest backup at "$bucketstr"...
                 dirbackup=(`aws s3 ls "$bucketstr" | awk '{ print $4 }'`)
                 filteredFile=()
                 for i in ${dirbackup[@]}; do
                     element=(`echo "$i" | awk "/[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql/"`)
                     filteredFile+=($element)
                 done
-                nearestfile="$(find_lastest_bk $filteredFile)"
-                echo Found lastest path: $bucketstr/$nearestfile
+                nearestfile="$(find_latest_bk $filteredFile)"
+                echo Found latest path: $bucketstr/$nearestfile
                 echo "Downloading..."
                 aws s3 cp "$bucketstr/$nearestfile" "backup.sql"
                 backuppath="backup.sql"
@@ -84,15 +84,15 @@ case "$method" in
         ;;
     "pvc") echo "Starting pvc restore..."
         if [ ! -f $location ]; then
-            echo "Backup file not found! Finding lastest backup..."
+            echo "Backup file not found! Finding latest backup..."
             cd /data/backup/$mysqlname
             now=`date +"%s"`
             dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
             if (( ${#dirbackup[@]} > 0 )); then
                 nearest=""
-                nearestfile="$(find_lastest_bk $dirbackup)"
+                nearestfile="$(find_latest_bk $dirbackup)"
                 backuppath="/data/backup/$mysqlname/$nearestfile"
-                echo Found lastest path: $backuppath
+                echo Found latest path: $backuppath
             else
                 echo "Can't found backup file"
                 backuppath=$location
@@ -108,7 +108,7 @@ case "$method" in
 		;;
     esac
 if [ $? -eq 0 ]; then
-
+    
 	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force drop $mysqlname
 
 	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force create $mysqlname
