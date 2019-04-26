@@ -155,7 +155,7 @@ if [ $? -eq 0 ]; then
 		BACK_PID=$!
 		wait $BACK_PID
 
-		if [ $siteurl != "" ] || [ $siteurl == "none" ]; then
+		if [ $siteurl != "" ] || [ $siteurl != "none" ]; then
 			/opt/rh/rh-mysql57/root/usr/bin/mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force -D $mysqlname -e "UPDATE wp_options SET option_value = '$siteurl' where option_name = 'siteurl' or option_name = 'home'"
 		fi
 		echo Done
