@@ -14,6 +14,12 @@ backuppath=""
 
 echo $siteurl
 
+if [ $siteurl != "" ] || [ $siteurl == "none" ]; then
+    echo $siteurl
+    else
+    echo 'not compare'
+fi
+
 #find_latest_bk() {
 #    if [ -z "$1" ]
 #    then
