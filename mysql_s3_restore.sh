@@ -45,40 +45,74 @@ case "$method" in
         aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
         aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
 
-        echo Getting object from "$object"
+        echo Checking url
 
-        aws s3 cp "$object" "backup.sql"
+        grep -e ".*\.sql$" <<< $object
 
-        if [ $? -eq 0 ]; then
-          backuppath="backup.sql"
-          echo "  Download successful!"
+        if [ $? -ne 0 ]; then
+            echo 'This is not sql file'
+            if aws s3 ls "$object" 2>&1 | grep -q 'NoSuchBucket\|AllAccessDisabled'; then
+                    echo This bucket is not exist or access denied
+                else
+                    echo Finding latest backup at "$object"...
+                    grep -e ".*\/$" <<< $object
+                    if [ $? -ne 0 ]; then object+="/"; fi
+                    dirbackup=(`aws s3 ls "$object" | awk '{ print $4 }'`)
+                    if [ ${#dirbackup[@]} -eq 0 ]; then
+                        echo 'No file found'
+                    else
+                        filteredFile=()
+                        for i in ${dirbackup[@]}; do
+                            element=(`echo "$i" | awk "/[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql/"`)
+                            filteredFile+=($element)
+                        done
+                        nearestfile="$(find_latest_bk $filteredFile)"
+                        echo Found latest path: $object/$nearestfile
+                        echo "Downloading..."
+                        aws s3 cp "$object/$nearestfile" "backup.sql"
+                        backuppath="backup.sql"
+                    fi
+                fi
         else
-            IFS="/"
-            read -ra ADDR <<< "$object"
-            len=${#ADDR[@]}
-            bucketstr="s3://"
-            if (( $(($len - 1)) <= 3 )); then
-                bucketstr+=${ADDR[2]}
+            echo Getting object from "$object"
+
+            aws s3 cp "$object" "backup.sql"
+
+            if [ $? -eq 0 ]; then
+              backuppath="backup.sql"
+              echo "  Download successful!"
             else
-                for ((i=2;i<=$(($len - 2));i++)); do
-                    bucketstr+=${ADDR[$i]}/
-                done
-            fi
-            if aws s3 ls "$bucketstr" 2>&1 | grep -q 'NoSuchBucket\|AllAccessDisabled'; then
-                echo This bucket is not exist or access denied
-            else
-                echo FAILED Could not get from s3 "backup.sql" from "$object". Finding latest backup at "$bucketstr"...
-                dirbackup=(`aws s3 ls "$bucketstr" | awk '{ print $4 }'`)
-                filteredFile=()
-                for i in ${dirbackup[@]}; do
-                    element=(`echo "$i" | awk "/[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql/"`)
-                    filteredFile+=($element)
-                done
-                nearestfile="$(find_latest_bk $filteredFile)"
-                echo Found latest path: $bucketstr/$nearestfile
-                echo "Downloading..."
-                aws s3 cp "$bucketstr/$nearestfile" "backup.sql"
-                backuppath="backup.sql"
+                IFS="/"
+                read -ra ADDR <<< "$object"
+                len=${#ADDR[@]}
+                bucketstr="s3://"
+                if (( $(($len - 1)) <= 3 )); then
+                    bucketstr+=${ADDR[2]}
+                else
+                    for ((i=2;i<=$(($len - 2));i++)); do
+                        bucketstr+=${ADDR[$i]}/
+                    done
+                fi
+                if aws s3 ls "$bucketstr" 2>&1 | grep -q 'NoSuchBucket\|AllAccessDisabled'; then
+                    echo This bucket is not exist or access denied
+                else
+                    echo FAILED Could not get from s3 "backup.sql" from "$object". Finding latest backup at "$bucketstr"...
+                    dirbackup=(`aws s3 ls "$bucketstr" | awk '{ print $4 }'`)
+                    if [ ${#dirbackup[@]} -eq 0 ]; then
+                        echo 'No file found'
+                    else
+                        filteredFile=()
+                        for i in ${dirbackup[@]}; do
+                            element=(`echo "$i" | awk "/[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql/"`)
+                            filteredFile+=($element)
+                        done
+                        nearestfile="$(find_latest_bk $filteredFile)"
+                        echo Found latest path: $bucketstr/$nearestfile
+                        echo "Downloading..."
+                        aws s3 cp "$bucketstr/$nearestfile" "backup.sql"
+                        backuppath="backup.sql"
+                    fi
+                fi
             fi
         fi
         ;;
