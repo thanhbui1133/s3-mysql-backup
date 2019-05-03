@@ -19,18 +19,23 @@ find_latest_bk() {
         exit 1
     else
         dirbackup=$1
-        nearest=""
+        if [ -z "$2" ]; then
+            nearest=""
+        else
+            nearest="$2"
+        fi
+        minoffsets=""
         for i in "${dirbackup[@]}"; do
             IFS="_"
             read -ra FILE_DATE <<< "$i"
             result="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
             result=`echo "$result" | sed -r 's/[.sql]+//g'`
             stamptemp=`date -d $result +"%s"`
-            if [ "$nearest" = "" ]; then
-                nearest=$stamptemp
-            fi
-            if [ "$stamptemp" -gt "$nearest" ]; then
-                nearest=$stamptemp
+            if [ "$nearest" = "" ]; then nearest=`date +"%s"`; fi
+            offsets=$(( $nearest - $stamptemp ))
+            if [ "$minoffsets" = "" ]; then minoffsets=$offsets; fi
+            if [ \( "$minoffsets" -gt "$offsets" \) -a \( "$offsets" -ge "0" \) ]; then
+                minoffsets=$offsets
                 nearestfile=$i
             fi
             IFS=""
@@ -117,50 +122,66 @@ case "$method" in
         fi
         ;;
     "pvc") echo "Starting pvc restore..."
-        if [ ! -f $location ]; then
-            echo "Backup file not found! Finding latest backup..."
-            cd /data/backup/$mysqlname
-            now=`date +"%s"`
-            dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
-            if (( ${#dirbackup[@]} > 0 )); then
-                nearest=""
-                nearestfile="$(find_latest_bk $dirbackup)"
-                backuppath="/data/backup/$mysqlname/$nearestfile"
-                echo Found latest path: $backuppath
+        if [[ ! -f $location || $location = "" ]]; then
+            echo "Backup file was entered not found!"
+            if [ $location = "" ]; then
+                echo "Finding lastest backup..."
+                targettime=""
             else
-                echo "Can't found backup file"
-                backuppath=$location
+                echo "Finding nearest backup..."
+                IFS="/"
+                read -ra ADDR <<< "$location"
+                filename=${ADDR[${#ADDR[@]}-1]}
+                targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
+                targetstamp=`date -d $targettime +"%s"`
             fi
+            if [ $? -eq 0 ]; then
+                cd /data/backup/$mysqlname
+                now=`date +"%s"`
+                dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
+                if (( ${#dirbackup[@]} > 0 )); then
+                    nearest=""
+                    nearestfile="$(find_latest_bk $dirbackup $targettime)"
+                    backuppath="/data/backup/$mysqlname/$nearestfile"
+                    echo Found latest path: $backuppath
+                else
+                    echo "No backup file at directory"
+                    backuppath=$location
+                fi
+            else
+                echo "Wrong file format"
+                exit 3
+            fi
+
         else
             echo "Backup file found"
             backuppath=$location
         fi
-        echo
         ;;
     *) echo "Method is none or invalid"
 	    exit 2
 		;;
     esac
-if [ $? -eq 0 ]; then
-
-	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force drop $mysqlname
-
-	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force create $mysqlname
-
-	if [ $? -eq 0 ]; then
-		/opt/rh/rh-mysql57/root/usr/bin/mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force $mysqlname < $backuppath &
-
-		BACK_PID=$!
-		wait $BACK_PID
-
-		if [ $siteurl != "" ] || [ $siteurl != "none" ]; then
-			/opt/rh/rh-mysql57/root/usr/bin/mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force -D $mysqlname -e "UPDATE wp_options SET option_value = '$siteurl' where option_name = 'siteurl' or option_name = 'home'"
-		fi
-		echo Done
-	else
-		echo FAILED to Import data;
-		exit 3
-	fi
-fi
+#if [ $? -eq 0 ]; then
+#
+#	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force drop $mysqlname
+#
+#	/opt/rh/rh-mysql57/root/usr/bin/mysqladmin -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force create $mysqlname
+#
+#	if [ $? -eq 0 ]; then
+#		/opt/rh/rh-mysql57/root/usr/bin/mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force $mysqlname < $backuppath &
+#
+#		BACK_PID=$!
+#		wait $BACK_PID
+#
+#		if [ $siteurl != "" ] || [ $siteurl != "none" ]; then
+#			/opt/rh/rh-mysql57/root/usr/bin/mysql -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass --force -D $mysqlname -e "UPDATE wp_options SET option_value = '$siteurl' where option_name = 'siteurl' or option_name = 'home'"
+#		fi
+#		echo Done
+#	else
+#		echo FAILED to Import data;
+#		exit 3
+#	fi
+#fi
 
 
