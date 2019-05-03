@@ -137,8 +137,10 @@ case "$method" in
                 targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
                 IFS="_"
                 read -ra FILE_DATE <<< "$targettime"
+                IFS=""
                 targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
                 targetstamp=`date -d $targettime +"%s"`
+
             fi
             if [ $? -eq 0 ]; then
                 cd /data/backup/$mysqlname
