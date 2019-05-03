@@ -12,6 +12,8 @@ location="$LOCATION"
 method="$METHODS"
 backuppath=""
 
+echo $mysqlname
+
 find_latest_bk() {
     if [ -z "$1" ]
     then
