@@ -148,7 +148,7 @@ case "$method" in
                 dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
                 if (( ${#dirbackup[@]} > 0 )); then
                     nearest=""
-                    nearestfile="$(find_latest_bk $dirbackup $targettime)"
+                    nearestfile="$(find_latest_bk $dirbackup $targetstamp)"
                     backuppath="/data/backup/$mysqlname/$nearestfile"
                     echo Found latest path: $backuppath
                 else
