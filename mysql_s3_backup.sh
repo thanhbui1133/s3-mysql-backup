@@ -102,7 +102,11 @@ for i in "${methodsArr[@]}"; do
         # Delete old files
         if [ $? -eq 0 ]; then
           echo "Check and deleting old file"
-          find "/data/backup/$folder" -type f -name '*.sql' -mtime +10 -exec rm {} \;
+          if [ -z $daytodel ]; then
+            echo "Invalid day"
+          else
+            find "/data/backup/$folder" -type f -name '*.sql' -mtime +$daytodel -exec rm {} \;
+          fi
         fi
 
         ;;
