@@ -105,7 +105,13 @@ for i in "${methodsArr[@]}"; do
           if [ -z $daytodel ]; then
             echo "Invalid day"
           else
-            find "/data/backup/$folder" -type f -name '*.sql' -mtime +$daytodel -exec rm {} \;
+            find "/data/backup/$folder" -type f -name '*.sql' -mtime +"$daytodel" -exec rm {} \;
+            if [ $? -eq 0 ]; then
+              echo OK Deleted old files in "/data/backup/$folder" before "$daystodel"
+            else
+              echo FAILED Could not delete old files in "/data/backup/$folder" before "$daystodel"
+              exit 2
+            fi
           fi
         fi
 
