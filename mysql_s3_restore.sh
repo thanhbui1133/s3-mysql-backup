@@ -40,7 +40,7 @@ find_latest_bk() {
                 minoffsets=$offsets
                 nearestfile=$i
             fi
-            IFS=""
+            unset IFS
         done
         echo $nearestfile
     fi
@@ -130,17 +130,24 @@ case "$method" in
                 echo "Finding lastest backup..."
                 targettime=""
             else
-                echo "Finding nearest backup..."
-                IFS="/"
-                read -ra ADDR <<< "$location"
-                filename=${ADDR[${#ADDR[@]}-1]}
-                targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
-                IFS="_"
-                read -ra FILE_DATE <<< "$targettime"
-                IFS=""
-                targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
-                targetstamp=`date -d $targettime +"%s"`
-
+                echo Checking location
+                grep -e ".*\.sql$" <<< $location
+                if [ $? -eq 0 ]; then
+                    IFS="/"
+                    read -ra ADDR <<< "$location"
+                    unset IFS
+                    filename=${ADDR[${#ADDR[@]}-1]}
+                    targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
+                    IFS="_"
+                    read -ra FILE_DATE <<< "$targettime"
+                    unset IFS
+                    targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
+                    targetstamp=`date -d $targettime +"%s"`
+                    echo "Finding nearest backup..."
+                else
+                    targetstamp=""
+                    echo "Finding lastest backup..."
+                fi
             fi
             if [ $? -eq 0 ]; then
                 cd /data/backup/$mysqlname
