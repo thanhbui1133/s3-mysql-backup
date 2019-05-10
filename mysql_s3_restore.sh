@@ -124,7 +124,7 @@ case "$method" in
         fi
         ;;
     "pvc") echo "Starting pvc restore..."
-        if [[ ! -f $location || $location = "" ]]; then
+        if [[ ! -f "/data/backup/"$location || $location = "" ]]; then
             echo "Backup file was entered not found!"
             if [ $location = "" ]; then
                 echo "Finding lastest backup..."
