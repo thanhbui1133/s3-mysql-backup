@@ -127,8 +127,8 @@ case "$method" in
         if [[ ! -f "/data/backup/"$location || $location = "" ]]; then
             echo "Backup file was entered not found!"
             if [ $location = "" ]; then
-                echo "Finding lastest backup..."
-                targettime=""
+                echo "Invalid input"
+                exit 4
             else
                 echo Checking location
                 grep -e ".*\.sql$" <<< $location
