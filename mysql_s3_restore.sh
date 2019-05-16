@@ -30,7 +30,7 @@ find_latest_bk() {
             read -ra FILE_DATE <<< "$i"
             result="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
             result=`echo "$result" | sed -r 's/[.sql]+//g'`
-            stamptemp=`date -d $result +"%s"`
+            stamptemp=`date -d "$result" +"%s"`
             if [ "$nearest" = "" ]; then nearest=`date +"%s"`; fi
             offsets=$(( $nearest - $stamptemp ))
             if [ "$minoffsets" = "" ]; then minoffsets=$offsets; fi
@@ -147,7 +147,7 @@ case "$method" in
                     read -ra FILE_DATE <<< "$targettime"
                     unset IFS
                     targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
-                    targetstamp=`date -d $targettime +"%s"`
+                    targetstamp=`date -d "$targettime" +"%s"`
                     echo "Finding nearest backup..."
                 else
                     targetstamp=""
@@ -162,7 +162,7 @@ case "$method" in
                 if (( ${#dirbackup[@]} > 0 )); then
                     nearest=""
                     nearestfile="$(find_latest_bk $dirbackup $targetstamp)"
-                    backuppath="/data/backup/$location/$nearestfile"
+                    backuppath="/data/backup/$location_temp/$nearestfile"
                     echo Found latest path: $backuppath
                 else
                     echo "No backup file at directory"
