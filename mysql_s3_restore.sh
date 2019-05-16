@@ -12,8 +12,6 @@ location="$LOCATION"
 method="$METHODS"
 backuppath=""
 
-echo $mysqlname
-
 find_latest_bk() {
     if [ -z "$1" ]
     then
@@ -124,9 +122,10 @@ case "$method" in
         fi
         ;;
     "pvc") echo "Starting pvc restore..."
-        if [[ ! -f "/data/backup/"$location || $location = "" ]]; then
+        if [[ ! -f "/data/backup/"$location || "$location" = "" ]]; then
             echo "Backup file was entered not found!"
-            if [ $location = "" ]; then
+            location_temp=""
+            if [ "$location" = "" ]; then
                 echo "Invalid input"
                 exit 4
             else
@@ -137,6 +136,12 @@ case "$method" in
                     read -ra ADDR <<< "$location"
                     unset IFS
                     filename=${ADDR[${#ADDR[@]}-1]}
+                    for i in ${ADDR[@]}; do
+                        if [ $i != $filename ]; then
+                            location_temp+=$i
+                            location_temp+="/"
+                        fi
+                    done
                     targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
                     IFS="_"
                     read -ra FILE_DATE <<< "$targettime"
@@ -147,20 +152,21 @@ case "$method" in
                 else
                     targetstamp=""
                     echo "Finding lastest backup..."
+                    location_temp=$location
                 fi
             fi
             if [ $? -eq 0 ]; then
-                cd /data/backup/$mysqlname
+                cd /data/backup/$location_temp
                 now=`date +"%s"`
                 dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
                 if (( ${#dirbackup[@]} > 0 )); then
                     nearest=""
                     nearestfile="$(find_latest_bk $dirbackup $targetstamp)"
-                    backuppath="/data/backup/$mysqlname/$nearestfile"
+                    backuppath="/data/backup/$location/$nearestfile"
                     echo Found latest path: $backuppath
                 else
                     echo "No backup file at directory"
-                    backuppath=$location
+                    exit 0
                 fi
             else
                 echo "Wrong file format"
