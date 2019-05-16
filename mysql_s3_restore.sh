@@ -158,6 +158,7 @@ case "$method" in
             if [ $? -eq 0 ]; then
                 cd /data/backup/$location_temp
                 now=`date +"%s"`
+                echo $targetstamp
                 dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
                 if (( ${#dirbackup[@]} > 0 )); then
                     nearest=""
