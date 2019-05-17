@@ -177,7 +177,7 @@ case "$method" in
                     nearest=""
                     nearestfile="$(find_latest_bk $dirbackup $targetstamp)"
                     backuppath="/data/backup/$location_temp$nearestfile"
-                    echo Found latest path: $backuppath
+                    echo Found path: $backuppath
                 else
                     echo "No backup file at directory"
                     exit 0
