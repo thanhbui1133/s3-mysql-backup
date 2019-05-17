@@ -24,7 +24,8 @@ find_latest_bk() {
         else
             nearest="$2"
         fi
-        minoffsets=""
+        posMinOffsets=""
+        negaMinOffsets=""
         for i in "${dirbackup[@]}"; do
             IFS="_"
             read -ra FILE_DATE <<< "$i"
@@ -32,11 +33,24 @@ find_latest_bk() {
             result=`echo "$result" | sed -r 's/[.sql]+//g'`
             stamptemp=`date -d "$result" +"%s"`
             if [ "$nearest" = "" ]; then nearest=`date +"%s"`; fi
-            offsets=$(( $nearest - $stamptemp ))
-            if [ "$minoffsets" = "" ]; then minoffsets=$offsets; fi
-            if [ \( "$minoffsets" -gt "$offsets" \) -a \( "$offsets" -ge "0" \) ]; then
-                minoffsets=$offsets
-                nearestfile=$i
+            offsets=$(( $stamptemp - $nearest ))
+            if [ "$offsets" -ge "0" ]; then
+               if [ "$posMinOffsets" = "" ]; then posMinOffsets=$offsets; nearestPosfile=$i; fi
+               if [ "$posMinOffsets" -gt "$offsets" ]; then
+                    posMinOffsets=$offsets
+                    nearestPosfile=$i
+               fi
+            else
+               if [ "$negaMinOffsets" = "" ]; then negaMinOffsets=$offsets; nearestNegafile=$i; fi
+               if [ "$negaMinOffsets" -lt "$offsets" ]; then
+                    negaMinOffsets=$offsets
+                    nearestNegafile=$i
+               fi
+            fi
+            if [ "$nearestPosfile" = "" ]; then
+                nearestfile=$nearestNegafile
+            else
+                nearestfile=$nearestPosfile
             fi
             unset IFS
         done
@@ -158,12 +172,11 @@ case "$method" in
             if [ $? -eq 0 ]; then
                 cd /data/backup/$location_temp
                 now=`date +"%s"`
-                echo $targetstamp
                 dirbackup=(`ls -d [0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql`)
                 if (( ${#dirbackup[@]} > 0 )); then
                     nearest=""
                     nearestfile="$(find_latest_bk $dirbackup $targetstamp)"
-                    backuppath="/data/backup/$location_temp/$nearestfile"
+                    backuppath="/data/backup/$location_temp$nearestfile"
                     echo Found latest path: $backuppath
                 else
                     echo "No backup file at directory"
