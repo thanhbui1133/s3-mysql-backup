@@ -215,12 +215,8 @@ if [ $? -eq 0 ]; then
 
 		BACK_PID=$!
 		wait $BACK_PID
-        echo $siteurl
-		if [ "$siteurl" != "" ] || [ "$siteurl" != "none" ]; then
-		    echo None
-			# /opt/rh/rh-mysql57/root/usr/bin/mysql -u wordpress -P 3306 -h 172.30.236.76 -paop2aGPApMKpQAnj --force -D wordpress_dnstorytest -e "UPDATE wp_options SET option_value = 'https://dn-story-test-dn-story-test.internal.ohoy.io/' where option_name = 'siteurl' or option_name = 'home'"
-		else
-		    echo Has string
+		if [ "$siteurl" != "" ] && [ "$siteurl" != "none" ]; then
+		    /opt/rh/rh-mysql57/root/usr/bin/mysql -u wordpress -P 3306 -h 172.30.236.76 -paop2aGPApMKpQAnj --force -D wordpress_dnstorytest -e "UPDATE wp_options SET option_value = 'https://dn-story-test-dn-story-test.internal.ohoy.io/' where option_name = 'siteurl' or option_name = 'home'"
 		fi
 		echo Done
 	else
