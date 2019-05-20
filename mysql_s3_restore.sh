@@ -104,9 +104,10 @@ case "$method" in
                 IFS="/"
                 read -ra ADDR <<< "$object"
                 len=${#ADDR[@]}
+                unset IFS
                 bucketstr="s3://"
                 if (( $(($len - 1)) <= 3 )); then
-                    bucketstr+=${ADDR[2]}
+                    bucketstr+=${ADDR[2]}/
                 else
                     for ((i=2;i<=$(($len - 2));i++)); do
                         bucketstr+=${ADDR[$i]}/
@@ -126,9 +127,9 @@ case "$method" in
                             filteredFile+=($element)
                         done
                         nearestfile="$(find_latest_bk $filteredFile)"
-                        echo Found latest path: $bucketstr/$nearestfile
+                        echo Found latest path: $bucketstr$nearestfile
                         echo "Downloading..."
-                        aws s3 cp "$bucketstr/$nearestfile" "backup.sql"
+                        aws s3 cp "$bucketstr$nearestfile" "backup.sql"
                         backuppath="backup.sql"
                     fi
                 fi
