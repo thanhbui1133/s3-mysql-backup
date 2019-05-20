@@ -106,6 +106,13 @@ case "$method" in
                 len=${#ADDR[@]}
                 unset IFS
                 bucketstr="s3://"
+                filename=${ADDR[${#ADDR[@]}-1]}
+                targettime=`echo "$filename" | sed -r 's/[.sql]+//g'`
+                IFS="_"
+                read -ra FILE_DATE <<< "$targettime"
+                unset IFS
+                targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
+                targetstamp=`date -d "$targettime" +"%s"`
                 if (( $(($len - 1)) <= 3 )); then
                     bucketstr+=${ADDR[2]}/
                 else
@@ -116,7 +123,7 @@ case "$method" in
                 if aws s3 ls "$bucketstr" 2>&1 | grep -q 'NoSuchBucket\|AllAccessDisabled'; then
                     echo This bucket is not exist or access denied
                 else
-                    echo FAILED Could not get from s3 "backup.sql" from "$object". Finding latest backup at "$bucketstr"...
+                    echo FAILED Could not get from s3 "backup.sql" from "$object". Finding latest backup at "$bucketstr"
                     dirbackup=(`aws s3 ls "$bucketstr" | awk '{ print $4 }'`)
                     if [ ${#dirbackup[@]} -eq 0 ]; then
                         echo 'No file found'
@@ -126,7 +133,7 @@ case "$method" in
                             element=(`echo "$i" | awk "/[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*_[0-9]*.sql/"`)
                             filteredFile+=($element)
                         done
-                        nearestfile="$(find_latest_bk $filteredFile)"
+                        nearestfile="$(find_latest_bk $filteredFile $targetstamp)"
                         echo Found latest path: $bucketstr$nearestfile
                         echo "Downloading..."
                         aws s3 cp "$bucketstr$nearestfile" "backup.sql"
