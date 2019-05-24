@@ -1,5 +1,3 @@
 #!/bin/bash
 
-json='{\"message\": \"Testing logging\",\"level\": \"info\"}'
-
-echo $json
+echo "[error] This message for testing"
