@@ -14,4 +14,4 @@ echo 123123
 
 echo "Test test"
 
-exit
+exit 4
