@@ -8,7 +8,7 @@ echo "[Error] Using a password on the command line interface can be insecure"
 
 >&2 echo "test a little"
 
-echo 123123
+>&1 echo 123123
 
 echo 123123
 
