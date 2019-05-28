@@ -23,7 +23,7 @@ datediff() {
     echo $(( (d1 - d2) / 86400 ))
 }
 
-/opt/rh/rh-mysql57/root/usr/bin/mysqldump -u $mysqluser -P $mysqlport -h $mysqlhost -u wordpress -p$mysqlpass $mysqlname > backup.sql;
+/opt/rh/rh-mysql57/root/usr/bin/mysqldump -u $mysqluser -P $mysqlport -h $mysqlhost -p$mysqlpass $mysqlname > backup.sql;
 
 if [ $? -eq 0 ]; then
   echo Dump database $mysqlname ok
@@ -66,7 +66,7 @@ for i in "${methodsArr[@]}"; do
             echo "Can't found day duration"
           else
             echo "Check and deleting old file"
-            list_time=(`aws s3 ls "s3://thanhbvs3/DNFokusv3_backup_test/wordpress_dnstorytest/" | awk '{ print $4 }'`)
+            list_time=(`aws s3 ls "$bucket/$folder" | awk '{ print $4 }'`)
             if [ ${#list_time[@]} -eq 0 ]; then
               echo 'No file found'
             else
@@ -84,7 +84,7 @@ for i in "${methodsArr[@]}"; do
                 targettime="${FILE_DATE[0]}/${FILE_DATE[1]}/${FILE_DATE[2]} ${FILE_DATE[3]}:${FILE_DATE[4]}:${FILE_DATE[5]}"
                 duration=`datediff $targettime $now`
                 if [ $duration -lt -10 ]; then
-                    aws s3 rm "s3://thanhbvs3/DNFokusv3_backup_test/wordpress_dnstorytest/$i.sql"
+                    aws s3 rm "$bucket/$folder/$i.sql"
                 fi
               done
             fi
