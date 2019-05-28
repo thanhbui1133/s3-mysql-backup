@@ -13,3 +13,5 @@ echo "[Error] Using a password on the command line interface can be insecure"
 echo 123123
 
 echo "Test test"
+
+exit
