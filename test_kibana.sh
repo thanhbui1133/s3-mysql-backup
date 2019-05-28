@@ -6,7 +6,8 @@ echo "[Warning] Using a password on the command line interface can be insecure"
 
 echo "[Error] Using a password on the command line interface can be insecure"
 
-exit 1
+>&2 echo "test a little"
+
 echo 123123
 
 echo 123123
